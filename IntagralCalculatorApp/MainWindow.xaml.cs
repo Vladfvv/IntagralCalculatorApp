@@ -36,7 +36,7 @@ namespace IntagralCalculatorApp
             InitializeComponent();
             inputClass = new InputClass();
             // BackgroundWorker
-            backgroundWorker = ((BackgroundWorker)this.FindResource("backgroundWorker"));
+ //           backgroundWorker = ((BackgroundWorker)this.FindResource("backgroundWorker"));
 
             // в коде
             //backgroundWorker.WorkerReportsProgress = true;
@@ -71,19 +71,19 @@ namespace IntagralCalculatorApp
 
         private void dispatcherButton_Click(object sender, RoutedEventArgs e)
         {
-            dispatcherButton.IsEnabled = false;
-            backgroundWorkerButton.IsEnabled = false;
-            pBar.Value = 0;            
+                
             double result = 0.0;
             if (ShowInputDialog())
             {
+                dispatcherButton.IsEnabled = false;
+                backgroundWorkerButton.IsEnabled = false;
+                pBar.Value = 0;
 
-
-                this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (ThreadStart)delegate ()
+                Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
                 {
-                    result = CalculateIntegral(lowerBound, upperBound, intervals, ReportProgress);
-
-                });
+                    double result = CalculateIntegral(lowerBound, upperBound, intervals, ReportProgress);
+                    ResultTextBlock.Text = $"Result: {result}";                    
+                }));
             }
             ResultTextBlock.Text = $"Result: {result}";
             dispatcherButton.IsEnabled = true;
@@ -106,7 +106,7 @@ namespace IntagralCalculatorApp
             return sum;
         }
 
-
+        /*
         private double CalculateIntegral(InputClass inputClass, Action<int> reportProgress)
         {
             double h = (inputClass.To - inputClass.From) / inputClass.Step;
@@ -121,7 +121,7 @@ namespace IntagralCalculatorApp
 
             return sum;
         }
-
+        */
 
 
 
@@ -158,26 +158,28 @@ namespace IntagralCalculatorApp
             //}
         }
 
-        
-        private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-         //  InputClass inputClass = (InputClass)e.Argument;
-        //    double result = CalculateIntegral(inputClass, backgroundWorker);
-        }
         private void ReportProgress(int progress)
         {
             Dispatcher.Invoke(() => pBar.Value = progress);
         }
 
-        private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-           // pBar.Value = e.ProgressPercentage;
+        /*     
+             private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+             {
+              //  InputClass inputClass = (InputClass)e.Argument;
+             //    double result = CalculateIntegral(inputClass, backgroundWorker);
+             }
 
-        }
 
-        private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
+             private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+             {
+                // pBar.Value = e.ProgressPercentage;
 
-        }
+             }
+
+             private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+             {
+
+             }*/
     }
 }

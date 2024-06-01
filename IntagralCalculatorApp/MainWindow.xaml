@@ -8,12 +8,12 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
-        <cm:BackgroundWorker x:Key="backgroundWorker" 
+        <!--<cm:BackgroundWorker x:Key="backgroundWorker" 
                        WorkerReportsProgress="True" 
                           WorkerSupportsCancellation="True" 	
                           DoWork="backgroundWorker_DoWork" 
                           ProgressChanged="backgroundWorker_ProgressChanged" 	
-                          RunWorkerCompleted="backgroundWorker_RunWorkerCompleted"/>
+                          RunWorkerCompleted="backgroundWorker_RunWorkerCompleted"/>-->
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
