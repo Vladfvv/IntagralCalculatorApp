@@ -50,7 +50,7 @@ namespace IntagralCalculatorApp
 
         private bool ShowInputDialog()//диалоговое окно
         {
-            DialogWindow dw = new DialogWindow();
+            DialogWindow dw = new DialogWindow(inputClass);
             if (dw.ShowDialog() == true)
             {
                 lowerBound = dw.LowerBound;

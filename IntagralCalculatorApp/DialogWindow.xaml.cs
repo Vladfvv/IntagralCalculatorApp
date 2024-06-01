@@ -31,6 +31,12 @@ namespace IntagralCalculatorApp
 
         }
 
+        public DialogWindow(InputClass param) :this()
+        {
+            this.DataContext = param; 
+
+        }
+
         private void btnSend_Click(object sender, RoutedEventArgs e)
         {
             if (double.TryParse(lowerTextBox.Text, out double lowerBound) &&
