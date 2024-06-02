@@ -32,7 +32,8 @@
             <RowDefinition/>
         </Grid.RowDefinitions>     
         <Button x:Name="dispatcherButton" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Width="100" Click="dispatcherButton_Click">Dispatcher</Button>
-        <Button x:Name="backgroundWorkerButton" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Width="120" Click="backgroundWorkerButton_Click">BackgroundWorker</Button>        
+        <Button x:Name="backgroundWorkerButton" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Width="120" Click="backgroundWorkerButton_Click">BackgroundWorker</Button>
+        <Button x:Name="cancelButton" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Width="120" Click="btnstop_Click">Stop</Button>       
         <StackPanel  x:Name="stackPanel" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" VerticalAlignment="Center">
             <Label Name="prl" Content="{Binding ElementName=pBar,Path=Value}" ContentStringFormat=" {0}%" />
             <TextBlock x:Name="ResultTextBlock" Margin="0,10,0,0"/>
