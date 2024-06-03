@@ -25,7 +25,8 @@ namespace IntagralCalculatorApp
             backgroundWorker.RunWorkerCompleted += backgroundWorker_RunWorkerCompleted;
             backgroundWorker.ProgressChanged += backgroundWorker_ProgressChanged;
             backgroundWorker.WorkerReportsProgress = true;
-            backgroundWorker.WorkerSupportsCancellation = true;         
+            backgroundWorker.WorkerSupportsCancellation = true;
+            cancelButton.IsEnabled = false;
 
 
         }
@@ -66,23 +67,28 @@ namespace IntagralCalculatorApp
         {
             dispatcherButton.IsEnabled = false;
             backgroundWorkerButton.IsEnabled = false;
+            cancelButton.IsEnabled = false;
             pBar.Value = 0;
             ResultTextBlock.Text = "";
+            ResultTextBlock2.Text = "";
+               
             if (ShowInputDialog())
-            {               
-
-                Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
-                {
-                    double result = CalculateIntegral(lowerBound, upperBound, intervals, ReportProgress);
-                    ResultTextBlock.Text = $"Result: {result}";
-                    dispatcherButton.IsEnabled = true;
-                    backgroundWorkerButton.IsEnabled = true;
-                }));
+            {
+                Thread t = new Thread(CalculateIntegral1);
+                t.Start();
+               
             }
+            dispatcherButton.IsEnabled = true;
+            backgroundWorkerButton.IsEnabled = true;
+            cancelButton.IsEnabled = false;
         }
 
-        private double CalculateIntegral(double a, double b, int n, Action<int> reportProgress)
+        private void CalculateIntegral1()
         {
+            double a = inputClass.From;
+            double b = inputClass.To;
+            int n = inputClass.Step;
+
             double h = (b - a) / n;
             double sum = 0.0;
 
@@ -90,12 +96,19 @@ namespace IntagralCalculatorApp
             {
                 double x = a + h * i;
                 sum += Math.Sqrt(x) * h;
-                reportProgress((i + 1) * 100 / n);
+               
+                Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+                {
+                    // double result = CalculateIntegral(lowerBound, upperBound, intervals, ReportProgress);
+                     ResultTextBlock.Text = $"Result: {sum}";
+                    //reportProgress((i + 1) * 100 / n);
+                    pBar.Value = i;
+                }));
             }
 
-            return sum;
+           // return sum;
         }
-
+        /*
         private double CalculateIntegral(InputClass inputClass, Action<int> reportProgress)
         {
             double h = (inputClass.To - inputClass.From) / inputClass.Step;
@@ -108,7 +121,31 @@ namespace IntagralCalculatorApp
                 reportProgress((i + 1) * 100 / inputClass.Step);
             }
             return sum;
+        }*/
+
+
+        private double CalculateIntegral(InputClass inputClass, BackgroundWorker backgroundWorker)
+        {
+            double h = (inputClass.To - inputClass.From) / inputClass.Step;
+            double sum = 0.0;
+
+            for (int i = 0; i < inputClass.Step; i++)
+            {
+                double x = inputClass.From + h * i;
+                sum += Math.Sqrt(x) * h;
+                //reportProgress((i + 1) * 100 / inputClass.Step);
+                if (backgroundWorker != null && backgroundWorker.WorkerReportsProgress)
+                {
+                    backgroundWorker.ReportProgress(100);
+                }
+
+
+            }
+            return sum;
         }
+
+
+
 
         private void backgroundWorkerButton_Click(object sender, RoutedEventArgs e)
         {
@@ -117,6 +154,7 @@ namespace IntagralCalculatorApp
             pBar.Value = 0;
             cancelButton.IsEnabled = true;
             ResultTextBlock.Text = "";
+            ResultTextBlock2.Text = "";
             if (ShowInputDialog(inputClass))
             {
                 
@@ -152,15 +190,15 @@ namespace IntagralCalculatorApp
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             InputClass input = (InputClass)e.Argument;
-            double res = CalculateIntegral(input, progress =>
-            {
+            double res = CalculateIntegral(input, backgroundWorker);
+            
                 if (backgroundWorker.CancellationPending)
                 {
                     e.Cancel = true;
                     return;
                 }
                // backgroundWorker.ReportProgress(progress);
-            });
+            
 
             e.Result = res;
 
@@ -186,7 +224,8 @@ namespace IntagralCalculatorApp
             else
             {
                 double result = (double)e.Result;
-                ResultTextBlock.Text = $"Result: {result}";
+                ResultTextBlock2.Text = $"Result: {result}";
+                
             }
 
             dispatcherButton.IsEnabled = true;
