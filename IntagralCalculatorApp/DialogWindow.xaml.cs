@@ -25,10 +25,17 @@ namespace IntagralCalculatorApp
         public double LowerBound { get; private set; }
         public double UpperBound { get; private set; }
         public int Intervals { get; private set; }
+
+       
         public DialogWindow()
         {
             InitializeComponent();
+            MessageBox.Show("SecondProcess: " + Thread.CurrentThread.ManagedThreadId);
+        }
 
+        public DialogWindow(InputClass ic) : this() 
+        {                  
+            this.DataContext = ic;
         }
 
         public DialogWindow(InputClass param) :this()
@@ -46,6 +53,7 @@ namespace IntagralCalculatorApp
                 LowerBound = lowerBound;
                 UpperBound = upperBound;
                 Intervals = intervals;
+
                 DialogResult = true;
                 Close();
             }

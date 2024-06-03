@@ -1,4 +1,4 @@
-﻿<Window x:Class="IntagralCalculatorApp.DialogWindow"
+<Window x:Class="IntagralCalculatorApp.DialogWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -30,11 +30,19 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <Label x:Name="lowerLimit" Grid.Column="0" VerticalAlignment="Center" Height="26" Margin="2,0,3,0">Lower Limit</Label>
+
         <TextBox x:Name="lowerTextBox" Grid.Row="0" Grid.Column="1" Height="20" Text="{Binding Path=From, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
         <Label x:Name="upperLimit" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Height="26" Margin="2,0,3,0">Upper Limit</Label>
         <TextBox x:Name="upperTextBox" Grid.Row="1" Grid.Column="1" Height="20" Text="{Binding Path=To, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ></TextBox>
         <Label x:Name="partitions" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Height="26" Margin="2,0,3,0">Number of partitions</Label>
         <TextBox x:Name="textBoxPartitions" Grid.Row="2" Grid.Column="1" Height="25" Text="{Binding Path=Step, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+        <TextBox x:Name="lowerTextBox" Text="{Binding Path=From, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Grid.Row="0" Grid.Column="1" Height="20"></TextBox>
+        <Label x:Name="upperLimit" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Height="26" Margin="2,0,3,0">Upper Limit</Label>
+        <TextBox x:Name="upperTextBox" Text="{Binding Path=To, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.Column="1" Height="20" ></TextBox>
+        <Label x:Name="partitions" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Height="26" Margin="2,0,3,0">Number of partitions</Label>
+        <TextBox x:Name="textBoxPartitions" Text="{Binding Path=Step, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" Grid.Column="1" Height="25" ></TextBox>
+
         <Button x:Name="selectedButton" Grid.Row="3" Grid.Column="1" Height="20" Width="120" HorizontalAlignment="Left" Click="btnSend_Click">Select</Button>
     </Grid>
 </Window>

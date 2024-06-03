@@ -1,54 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 using System.Windows.Threading;
 
 namespace IntagralCalculatorApp
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        InputClass inputClass;
+        private InputClass inputClass;
         BackgroundWorker backgroundWorker;
         private double lowerBound;
         private double upperBound;
         private int intervals;
 
-
-
         public MainWindow()
         {
             InitializeComponent();
             inputClass = new InputClass();
-            // BackgroundWorker
- //           backgroundWorker = ((BackgroundWorker)this.FindResource("backgroundWorker"));
 
-            // в коде
-            //backgroundWorker.WorkerReportsProgress = true;
-            //backgroundWorker.WorkerSupportsCancellation = true;
-            //backgroundWorker.DoWork += backgroundWorker_DoWork;
-            //backgroundWorker.ProgressChanged += backgroundWorker_ProgressChanged;
-            //backgroundWorker.RunWorkerCompleted += backgroundWorker_RunWorkerCompleted;
-            //backgroundWorker = ((BackgroundWorker)this.FindResource("backgroundWorker"));
+            // Инициализация BackgroundWorker
+            backgroundWorker = new BackgroundWorker();
+            backgroundWorker.DoWork += backgroundWorker_DoWork;
+            backgroundWorker.RunWorkerCompleted += backgroundWorker_RunWorkerCompleted;
+            backgroundWorker.ProgressChanged += backgroundWorker_ProgressChanged;
+            backgroundWorker.WorkerReportsProgress = true;
+            backgroundWorker.WorkerSupportsCancellation = true;         
+
+
         }
 
-
-        private bool ShowInputDialog()//диалоговое окно
+        private bool ShowInputDialog()
         {
             DialogWindow dw = new DialogWindow(inputClass);
             if (dw.ShowDialog() == true)
@@ -64,32 +46,40 @@ namespace IntagralCalculatorApp
             return false;
         }
 
-
-
-
-
+        private bool ShowInputDialog(InputClass inputClass)
+        {
+            DialogWindow dw = new DialogWindow();
+            if (dw.ShowDialog() == true)
+            {
+                lowerBound = dw.LowerBound;
+                upperBound = dw.UpperBound;
+                intervals = dw.Intervals;
+                inputClass.From = dw.LowerBound;
+                inputClass.To = dw.UpperBound;
+                inputClass.Step = dw.Intervals;
+                return true;
+            }
+            return false;
+        }
 
         private void dispatcherButton_Click(object sender, RoutedEventArgs e)
         {
-                
-            double result = 0.0;
+            dispatcherButton.IsEnabled = false;
+            backgroundWorkerButton.IsEnabled = false;
+            pBar.Value = 0;
+            ResultTextBlock.Text = "";
             if (ShowInputDialog())
-            {
-                dispatcherButton.IsEnabled = false;
-                backgroundWorkerButton.IsEnabled = false;
-                pBar.Value = 0;
+            {               
 
                 Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
                 {
                     double result = CalculateIntegral(lowerBound, upperBound, intervals, ReportProgress);
-                    ResultTextBlock.Text = $"Result: {result}";                    
+                    ResultTextBlock.Text = $"Result: {result}";
+                    dispatcherButton.IsEnabled = true;
+                    backgroundWorkerButton.IsEnabled = true;
                 }));
             }
-            ResultTextBlock.Text = $"Result: {result}";
-            dispatcherButton.IsEnabled = true;
-            backgroundWorkerButton.IsEnabled = true;            
         }
-
 
         private double CalculateIntegral(double a, double b, int n, Action<int> reportProgress)
         {
@@ -106,7 +96,6 @@ namespace IntagralCalculatorApp
             return sum;
         }
 
-        /*
         private double CalculateIntegral(InputClass inputClass, Action<int> reportProgress)
         {
             double h = (inputClass.To - inputClass.From) / inputClass.Step;
@@ -118,44 +107,21 @@ namespace IntagralCalculatorApp
                 sum += Math.Sqrt(x) * h;
                 reportProgress((i + 1) * 100 / inputClass.Step);
             }
-
             return sum;
         }
-        */
-
-
 
         private void backgroundWorkerButton_Click(object sender, RoutedEventArgs e)
         {
             dispatcherButton.IsEnabled = false;
-            backgroundWorkerButton.IsEnabled = false;            
+            backgroundWorkerButton.IsEnabled = false;
             pBar.Value = 0;
-            if (ShowInputDialog())
+            cancelButton.IsEnabled = true;
+            ResultTextBlock.Text = "";
+            if (ShowInputDialog(inputClass))
             {
-                BackgroundWorker worker = new BackgroundWorker
-                {
-                    WorkerReportsProgress = true
-                };
-                worker.DoWork += (s, args) =>
-                {
-                    args.Result = CalculateIntegral(lowerBound, upperBound, intervals, worker.ReportProgress);
-                };
-                worker.ProgressChanged += (s, args) =>
-                {
-                    pBar.Value = args.ProgressPercentage;
-                };
-                worker.RunWorkerCompleted += (s, args) =>
-                {
-                    ResultTextBlock.Text = $"Result: {args.Result}";
-
-                };
-                worker.RunWorkerAsync();               
+                
+                backgroundWorker.RunWorkerAsync(inputClass);
             }
-            dispatcherButton.IsEnabled = true;
-            backgroundWorkerButton.IsEnabled = true;
-            //{
-            //    backgroundWorker.RunWorkerAsync(inputClass);               
-            //}
         }
 
         private void ReportProgress(int progress)
@@ -163,23 +129,69 @@ namespace IntagralCalculatorApp
             Dispatcher.Invoke(() => pBar.Value = progress);
         }
 
-        /*     
-             private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
-             {
-              //  InputClass inputClass = (InputClass)e.Argument;
-             //    double result = CalculateIntegral(inputClass, backgroundWorker);
-             }
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            backgroundWorker.CancelAsync();
+            dispatcherButton.IsEnabled = true;
+            backgroundWorkerButton.IsEnabled = true;
+        }
+
+        private void btnstop_Click(object sender, RoutedEventArgs e)
+        {
+            if (backgroundWorker.IsBusy)
+            {
+                backgroundWorker.CancelAsync();
+            }
+            dispatcherButton.IsEnabled = true;
+            backgroundWorkerButton.IsEnabled = true;
+            cancelButton.IsEnabled = false;
+            MessageBox.Show("Вы прервали операцию вычисления");
+            //pBar.Value = 0;
+        }
+
+        private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            InputClass input = (InputClass)e.Argument;
+            double res = CalculateIntegral(input, progress =>
+            {
+                if (backgroundWorker.CancellationPending)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+               // backgroundWorker.ReportProgress(progress);
+            });
+
+            e.Result = res;
 
 
-             private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-             {
-                // pBar.Value = e.ProgressPercentage;
 
-             }
+        }
 
-             private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-             {
+        private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            pBar.Value = e.ProgressPercentage;
+        }
 
-             }*/
+        private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+            {
+                MessageBox.Show("Operation cancelled");
+            }
+            else if (e.Error != null)
+            {
+                MessageBox.Show($"Error: {e.Error.Message}");
+            }
+            else
+            {
+                double result = (double)e.Result;
+                ResultTextBlock.Text = $"Result: {result}";
+            }
+
+            dispatcherButton.IsEnabled = true;
+            backgroundWorkerButton.IsEnabled = true;
+            cancelButton.IsEnabled = false;
+        }
     }
 }

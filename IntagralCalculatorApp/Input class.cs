@@ -10,11 +10,7 @@ namespace IntagralCalculatorApp
 {
     public class InputClass : INotifyPropertyChanged
     {
-
-
-        //public double From { get; set; }
-        //public double To { get; set; }
-        //public int Step { get; set; }
+             
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -81,16 +77,7 @@ namespace IntagralCalculatorApp
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        //public double Result { get; set; }
-
-        /*public InputClass() {}
-
-        public InputClass(double from, double to, int step)
-        {
-            From = from;
-            To = to;
-            Step = step;
-        }*/
+       
     }
 
 
